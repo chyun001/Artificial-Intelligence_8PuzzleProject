@@ -14,17 +14,7 @@ public:
 //Returns the goal state of the puzzle
 vector<int> ReturnPuzzleGoal()
 {
-	vector<int> Puzzle;
-	Puzzle.push_back(1);
-	Puzzle.push_back(2);
-	Puzzle.push_back(3);
-	Puzzle.push_back(4);
-	Puzzle.push_back(5);
-	Puzzle.push_back(6);
-	Puzzle.push_back(7);
-	Puzzle.push_back(8);
-	Puzzle.push_back(0);
-
+	vector<int> Puzzle = {1,2,3,4,5,6,7,8,0};
 	return Puzzle;
 }
 
