@@ -536,16 +536,7 @@ Node Search(vector<int> Puzzle, vector<int> Puzzle_Goal, int AlgorithmChoice)
 //Uses a default puzzle
 void DefaultPuzzle()
 {
-	vector<int> Puzzle;
-	Puzzle.push_back(0);
-	Puzzle.push_back(1);
-	Puzzle.push_back(2);
-	Puzzle.push_back(4);
-	Puzzle.push_back(5);
-	Puzzle.push_back(3);
-	Puzzle.push_back(7);
-	Puzzle.push_back(8);
-	Puzzle.push_back(6);
+	vector<int> Puzzle = { 0,1,2,4,5,3,7,8,6 };
 	
 	//Choice of Algorithm
 	cout << "Enter your choice of algorithm" << endl;
