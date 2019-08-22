@@ -617,7 +617,5 @@ int main()
 		cin >> AlgoChoice;
 		Node EndGoal = Search(Puzzle, ReturnPuzzleGoal(), AlgoChoice); //Initiate search
 	}
-
-	system("pause");
 	return 0;
 }
