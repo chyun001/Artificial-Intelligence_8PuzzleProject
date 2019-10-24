@@ -51,15 +51,14 @@ void swap(Node* a, Node* b)
 
 int partition(vector<Node*> Puzzle, int low, int high)
 {
-	int pivot = Puzzle.at(high)->Gn + Puzzle.at(high)->Hn; // pivot  
-	int i = (low - 1); // Index of smaller element  
+	int pivot = Puzzle.at(high)->Gn + Puzzle.at(high)->Hn;
+	int i = (low - 1);
 
-	for (int j = low; j <= high - 1; j++)
+	for (int j = low; j <= high - 1; ++j)
 	{
-		// If current element is smaller than the pivot  
 		if (Puzzle.at(j)->Gn + Puzzle.at(j)->Hn < pivot)
 		{
-			i++; // increment index of smaller element  
+			++i; 
 			swap(Puzzle.at(i), Puzzle.at(j));
 		}
 	}
