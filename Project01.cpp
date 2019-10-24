@@ -11,6 +11,13 @@ public:
 	int Hn = 0;
 };
 
+void dequeue(vector<Node*> &myVec)
+{
+	for (int i = 0; i < myVec.size(); ++i)
+		delete myVec.at(i);
+	myVec.clear();
+}
+
 //Returns the goal state of the puzzle
 vector<int> ReturnPuzzleGoal()
 {
@@ -27,28 +34,47 @@ void DisplayPuzzle(vector<int> Puzzle)
 	cout << endl;
 }
 
-//Sorts the unvisited nodes in the vector least to greatest using g(n) + h(n)
-void SortNodes(vector<Node*> Puzzle)
+void swap(Node* a, Node* b)
 {
-	for(int i = 0; i < Puzzle.size(); ++i)
+	vector<int> HoldPuzzle = a->Puzzle;
+	int Gn = a->Gn;
+	int Hn = a->Hn;
+
+	a->Puzzle = b->Puzzle;
+	a->Gn = b->Gn;
+	a->Hn = b->Hn;
+
+	b->Puzzle = HoldPuzzle;
+	b->Hn = Hn;
+	b->Gn = Gn;
+}
+
+int partition(vector<Node*> Puzzle, int low, int high)
+{
+	int pivot = Puzzle.at(high)->Gn + Puzzle.at(high)->Hn; // pivot  
+	int i = (low - 1); // Index of smaller element  
+
+	for (int j = low; j <= high - 1; j++)
 	{
-		for(int j = i + 1; j < Puzzle.size(); ++j)
+		// If current element is smaller than the pivot  
+		if (Puzzle.at(j)->Gn + Puzzle.at(j)->Hn < pivot)
 		{
-			if(Puzzle.at(i)->Gn + Puzzle.at(i)->Hn > Puzzle.at(j)->Gn + Puzzle.at(j)->Hn)
-			{
-				vector<int> HoldPuzzle = Puzzle.at(i)->Puzzle;
-				int Gn = Puzzle.at(i)->Gn;
-				int Hn = Puzzle.at(i)->Hn;
-				
-				Puzzle.at(i)->Puzzle = Puzzle.at(j)->Puzzle;
-				Puzzle.at(i)->Gn = Puzzle.at(j)->Gn;
-				Puzzle.at(i)->Hn = Puzzle.at(j)->Hn;
-				
-				Puzzle.at(j)->Puzzle = HoldPuzzle;
-				Puzzle.at(j)->Hn = Hn;
-				Puzzle.at(j)->Gn = Gn;
-			}
+			i++; // increment index of smaller element  
+			swap(Puzzle.at(i), Puzzle.at(j));
 		}
+	}
+	swap(Puzzle.at(i + 1), Puzzle.at(high));
+	return (i + 1);
+}
+
+//Sorts the unvisited nodes in the vector least to greatest using g(n) + h(n)
+void quickSort(vector<Node*> Puzzle, int low, int high)
+{
+	if (low < high)
+	{
+		int pi = partition(Puzzle, low, high);
+		quickSort(Puzzle, low, pi - 1);
+		quickSort(Puzzle, pi + 1, high);
 	}
 }
 
@@ -357,7 +383,7 @@ Node MoveRight(Node NewPuzzle)
 }
 
 //Contains UCS and A* algorithm
-Node Search(vector<int> Puzzle, vector<int> Puzzle_Goal, int AlgorithmChoice)
+void Search(vector<int> Puzzle, vector<int> Puzzle_Goal, int AlgorithmChoice)
 {
 	//Variables used to keep track of the state of the expansion
 	int ExpandedNodes = 0;
@@ -365,7 +391,7 @@ Node Search(vector<int> Puzzle, vector<int> Puzzle_Goal, int AlgorithmChoice)
 	int MaximumDepth = 0;
 	bool Expanded = false;
 	
-	//NodeVector keeps track of the cost of each node while NodeVisited stores the Nodes visited
+	//NodeVector keeps track of the incoming new nodes while NodeVisited stores the Nodes visited
 	vector<Node*> NodeVector;
 	vector<Node*> NodeVisited;
 
@@ -428,8 +454,11 @@ Node Search(vector<int> Puzzle, vector<int> Puzzle_Goal, int AlgorithmChoice)
 			cout << MaximumDepth;
 			cout << "." << endl;
 			
-			return HoldTopNode;
-			//break;
+			//Finished so now delete/dereference the stored nodes
+			dequeue(NodeVector);
+			dequeue(NodeVisited);
+
+			return;
 		}
 
 		//Displays the puzzle with the cost and heuristic
@@ -528,9 +557,10 @@ Node Search(vector<int> Puzzle, vector<int> Puzzle_Goal, int AlgorithmChoice)
 			Expanded = false;
 			++ExpandedNodes;
 		}
-		SortNodes(NodeVector); //Sort the vector of nodes by cost
+		//Sort the vector of nodes by cost
+		quickSort(NodeVector, 0, NodeVector.size() - 1); 
 	}
-	return *InitialNode; //Returning inital puzzle means failure
+	return;
 }
 
 //Uses a default puzzle
@@ -588,15 +618,10 @@ int main()
 		int Row03N3;
 		cin >> Row03N1 >> Row03N2 >> Row03N3;
 		
-		Puzzle.push_back(Row01N1);
-		Puzzle.push_back(Row01N2);
-		Puzzle.push_back(Row01N3);
-		Puzzle.push_back(Row02N1);
-		Puzzle.push_back(Row02N2);
-		Puzzle.push_back(Row02N3);
-		Puzzle.push_back(Row03N1);
-		Puzzle.push_back(Row03N2);
-		Puzzle.push_back(Row03N3);
+		//Stores the user puzzle in vector Puzzle
+		Puzzle = { Row01N1, Row01N2, Row01N3,
+				  Row02N1, Row02N2, Row02N3,
+				  Row03N1, Row03N2, Row03N3 };
 		
 		//Choice of Algorithm | 1 = UCS | 2 = Misplaced | 3 = Manhattan |
 		cout << "Enter your choice of algorithm" << endl;
@@ -606,7 +631,9 @@ int main()
 		
 		int AlgoChoice;
 		cin >> AlgoChoice;
-		Node EndGoal = Search(Puzzle, ReturnPuzzleGoal(), AlgoChoice); //Initiate search
+		Search(Puzzle, ReturnPuzzleGoal(), AlgoChoice); //Initiate search
 	}
+
+	system("pause");
 	return 0;
 }
